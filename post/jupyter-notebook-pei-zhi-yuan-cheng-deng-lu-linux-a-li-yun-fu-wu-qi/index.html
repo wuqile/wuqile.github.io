@@ -1,0 +1,205 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="description" content="" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Jupyter Notebook 配置远程登录   linux阿里云服务器  | Gridea</title>
+<link rel="shortcut icon" href="https://wuqile.github.io//favicon.ico?v=1563163914606">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+<link rel="stylesheet" href="https://wuqile.github.io//styles/main.css">
+
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+<script src="https://cdn.bootcss.com/moment.js/2.23.0/moment.min.js"></script>
+
+
+
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://wuqile.github.io/">
+  <img class="avatar" src="https://wuqile.github.io//images/avatar.png?v=1563163914606" alt="">
+  </a>
+  <h1 class="site-title">
+    Gridea
+  </h1>
+  <p class="site-description">
+    温故而知新
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              Jupyter Notebook 配置远程登录   linux阿里云服务器 
+            </h2>
+            <div class="post-info">
+              <time class="post-time">
+                · 2019-07-15 ·
+              </time>
+              
+            </div>
+            
+              <div class="post-feature-image" style="background-image: url('https://wuqile.github.io//post-images/jupyter-notebook-pei-zhi-yuan-cheng-deng-lu-linux-a-li-yun-fu-wu-qi.jpg')">
+              </div>
+            
+            <div class="post-content">
+              <h1 id="1前提条件">1.前提条件</h1>
+<ul>
+<li>下载并安装anaconda64位linux,将anaconda加入环境变量</li>
+</ul>
+<pre><code># 下载：
+wget  https://mirrors.tuna.tsinghua.edu.cn/anaconda/archive/Anaconda3-5.1.0-Linux-x86_64.sh
+
+# 加环境变量：
+vim /etc/profile  
+export PATH=/root/anaconda3/bin:$PATH
+</code></pre>
+<h1 id="2-设置notebook登陆密码">2. 设置notebook登陆密码</h1>
+<ul>
+<li>终端输入命令==python3==，输python则进入2.X版本，然后输入下列代码</li>
+</ul>
+<pre><code>from notebook.auth import passwd
+passwd()
+
+输入2遍后，生成密码密文，记下备用
+</code></pre>
+<p><img src="https://i.loli.net/2019/07/15/5d2bf8b415cd650429.png" alt="title"></p>
+<h1 id="3-编辑配置文件">3. 编辑配置文件</h1>
+<ul>
+<li>生成配置文件</li>
+</ul>
+<pre><code>#root用户
+jupyter notebook --generate-config --allow-root
+
+#非root用户
+jupyter notebook --generate-config
+</code></pre>
+<ul>
+<li>编辑配置文档</li>
+</ul>
+<pre><code># 打开文档
+vi /root/.jupyter/jupyter_notebook_config.py
+
+</code></pre>
+<ul>
+<li>修改以下选项并取消==注释==</li>
+</ul>
+<pre><code># 允许远程
+c.NotebookApp.allow_remote_access = True
+
+# 白名单ip
+c.NotebookApp.ip = '*'
+
+# 登陆密码
+c.NotebookApp.password = u'sha1:1a8ac0ac32af:b95865f1011....'
+
+# 端口
+c.NotebookApp.port = 8888
+
+# 不打开浏览器
+c.NotebookApp.open_browser = False
+
+# 设置目录
+c.NotebookApp.notebook_dir = '/root/python/'
+
+# win端启动不用token，切换浏览器时直接http://localhost:8888登入
+c.NotebookApp.token = ''
+</code></pre>
+<h1 id="4-后台启动jupyter-notebook">4. 后台启动jupyter notebook</h1>
+<pre><code># 用户登出后进程继续工作 - nohup
+nohup jupyter notebook --allow-root &amp;
+</code></pre>
+<h1 id="5-阿里云按端口配置安全组">5. 阿里云按==端口==配置安全组</h1>
+<p><img src="https://i.loli.net/2019/07/02/5d1b25331e0dc21383.png" alt="title"></p>
+<h1 id="6-远程登入">6. 远程登入</h1>
+<ul>
+<li>服务器ip+端口：http://xxx.xx.xx.xxx:8888
+<img src="https://i.loli.net/2019/07/15/5d2bf903a28cf85140.png" alt="title"></li>
+</ul>
+<h1 id="7-关闭后台notebook">7. 关闭后台notebook</h1>
+<pre><code># 查看进程PID
+ps -aux|grep jupyter
+
+# 杀进程
+kill -9 pid
+</code></pre>
+<h1 id="8-其他notebook配置">8. 其他notebook配置</h1>
+<ul>
+<li><a href="https://github.com/wuqile/gitnote/blob/master/%E5%AD%A6%E4%B9%A0/jupyter%20notebook%20%E5%8D%95%E5%85%83%E6%A0%BC%E8%BE%93%E5%87%BA%E5%A4%9A%E4%B8%AA%E7%BB%93%E6%9E%9C.md">jupyter notebook 单元格输出多个结果 &amp; 代码自动补全</a></li>
+<li><a href="https://github.com/wuqile/gitnote/blob/master/%E5%AD%A6%E4%B9%A0/Jupyter%20Notebook%E8%AE%BE%E7%BD%AE%E5%BC%80%E6%9C%BA%E5%90%AF%E5%8A%A8.md">jupyter notebook Windows设置</a></li>
+</ul>
+
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://wuqile.github.io//post/hello-gridea">
+              <h3 class="post-title">
+                Hello Gridea
+              </h3>
+            </a>
+          </div>
+        
+
+        
+
+        <div class="site-footer">
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | 
+  <a class="rss" href="https://wuqile.github.io//atom.xml" target="_blank">RSS</a>
+</div>
+
+<script>
+  hljs.initHighlightingOnLoad()
+</script>
+
+      </div>
+    </div>
+  </body>
+</html>
